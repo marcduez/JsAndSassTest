@@ -1,0 +1,98 @@
+﻿@using JsAndSassTest.WebSite.Extensions
+@using JsAndSassTest.WebSite.Services
+@using Newtonsoft.Json
+@model dynamic
+<!DOCTYPE html>
+<html data-ng-app="app">
+<head>
+    <title>title</title>
+    @if (Html.IsContentBundled())
+    {
+        @Html.RenderStyleSheetBundle("~/Styles/Styles.min.css")
+    }
+    else
+    {
+        <link rel="stylesheet" href="~/Styles/Styles.scss" />
+    }
+</head>
+<body>
+    <script type="text/ng-template" id="state1">
+        <h1>State 1</h1>
+        <hr />
+        <a ui-sref="state1.list">Show List</a>
+        <div ui-view></div>
+    </script>
+    <script type="text/ng-template" id="state1.list">
+        <h3>List of State 1 Items</h3>
+        <ul>
+            <li ng-repeat="item in items">{{ item }}</li>
+        </ul>
+    </script>
+    <script type="text/ng-template" id="state2">
+        <h1>State 2</h1>
+        <hr />
+        <a ui-sref="state2.list">Show List</a>
+        <div ui-view></div>
+    </script>
+    <script type="text/ng-template" id="state2.list">
+        <h3>List of State 2 Things</h3>
+        <ul>
+            <li ng-repeat="thing in things">{{ thing }}</li>
+        </ul>
+    </script>
+
+    <div data-ng-controller="ctrl">
+        <div data-ui-view=""></div>
+        <!-- We'll also add some navigation: -->
+        <a data-ui-sref="state1">State 1</a>
+        <a data-ui-sref="state2">State 2</a>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.15/angular-ui-router.js"></script>
+    <script src="~/Scripts/ocLazyLoad.js"></script>
+    @Html.RenderScriptBundle("~/Scripts/Bundle1.min.js")
+    <script>
+        angular.module("app", ["ui.router", "oc.lazyLoad"])
+            .controller("ctrl", function() {
+            })
+            .config(function($stateProvider, $urlRouterProvider) {
+
+                // For any unmatched url, redirect to /state1
+                $urlRouterProvider.otherwise("/state1");
+
+                // Now set up the states
+                $stateProvider
+                    .state("state1", {
+                        url: "/state1",
+                        templateUrl: "state1"
+                    })
+                    .state("state1.list", {
+                        url: "/list",
+                        templateUrl: "state1.list",
+                        controller: function(lazyLoads, $scope, testyTester) {
+                            $scope.items = ["A", "List", "Of", "Items"];
+                            testyTester.test();
+                        },
+                        resolve: {
+                            lazyLoads: [
+                                '$ocLazyLoad', function($ocLazyLoad) {
+                                    return $ocLazyLoad.load(@Html.Raw(JsonConvert.SerializeObject(StaticContentPathResolver.GetBundleUrls("~/Scripts/Bundle2.min.js").Select(x => Url.Content(x)))));
+                                }
+                            ]
+                        }
+                    })
+                    .state("state2", {
+                        url: "/state2",
+                        templateUrl: "state2"
+                    })
+                    .state("state2.list", {
+                        url: "/list",
+                        templateUrl: "state2.list",
+                        controller: function($scope) {
+                            $scope.things = ["A", "Set", "Of", "Things"];
+                        }
+                    });
+            });
+    </script>
+</body>
+</html>

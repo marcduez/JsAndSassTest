@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <!-- Ignoring JSLint error JS1137: "Reserved words and should not be used as an identifier". Angular uses "finally" as a method name. -->
+  <!-- Ignoring JSLint error JS1267: "Always use full statement blocks". I don't agree with this doctrine. -->
+  <!-- Ignoring JSLint error JS1268: "Variable defined but not referenced". Because of the way TypeScript creates module namespaces, this error occurs often. -->
+  <arguments>-strict:true -ignore:JS1137,JS1267,JS1268 -global:angular,jQuery</arguments>
+
+  <output path="Scripts/Bundle1.min.js">
+    <input path="Scripts/Script1.js" />
+    <input path="Scripts/Script2.js" />
+  </output>
+
+  <output path="Scripts/Bundle2.min.js">
+    <input path="Scripts/Script3.js" />
+    <input path="Scripts/Script4.js" />
+  </output>
+
+  <output path="Styles/Styles.min.css">
+    <input path="Styles/Styles.css" />
+  </output>
+
+</root>
